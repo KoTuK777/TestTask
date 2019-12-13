@@ -8,6 +8,8 @@
 
 using namespace std;
 
+int idx = 0;
+
 class Player {
 private:
 	string name;
@@ -27,10 +29,15 @@ public:
 		if (rank >= 25)	rank -= 25;
 	}
 
-	Player(string name, int rank, int id) {
+	Player() {
+		name = "unknown";
+		id = ++idx;
+	}
+
+	Player(string name, int rank) {
 		setName(name);
 		this->rank = rank;
-		this->id = id;
+		this->id = ++idx;
 	}
 
 	string getName() {
@@ -61,7 +68,7 @@ public:
 	}
 
 	string getName() {
-		return name;
+		cout << name << endl;
 	}
 	int getHP() {
 		return hp;
@@ -93,6 +100,10 @@ public:
 class Session {
 };
 
+
+
+
+
 int main() {
 
 	/*vector<void> players;
@@ -101,18 +112,29 @@ int main() {
 	players[0] = player;
 
 	cout << players[0] << endl;*/
+	const int SIZE = 5;
 
-	Player player1("Tom", 1000, 0);
-	Player player2("Jame", 1000, 0);
-	Player player3("Stive", 1000, 0);
+	Player player1("Tom", 1000);
+	Player player2("Jame", 1000);
+	Player player3("Stive", 1000);
+	Player player4("John", 1000);
+	Player player5("Rick", 1000);
 
 
-	/*Player arr[] = {};*/
+	Player arr[SIZE];
+	arr[0] = player1;
+	arr[1] = player2;
+	arr[2] = player3;
 
 
 
-	cout << player1.getName() << endl;
-	cout << player2.getName() << endl;
+
+	cout << arr[0].getID() << endl;
+	cout << arr[1].getID() << endl;
+	cout << arr[2].getID() << endl;
+	cout << player1.getID() << endl;
+	cout << player2.getID() << endl;
+	cout << player3.getID() << endl;
 	/*cout << arr[0].getName() << endl;*/
 
 	
