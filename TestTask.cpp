@@ -91,9 +91,6 @@ public:
 };
 
 class TeamPart {
-private:
-	
-
 public:
 	Player player;
 	Hero hero;
@@ -123,51 +120,74 @@ class Session {
 
 };
 
-void createPlayers(int n) {
-	string names[12] = {"Tom", "Jame", "Stive", "John", "Rick", "Fred", "Eric", "Diego", "Luke", "Philip", "Oliver", "Jake"};
-	vector<Player*> Players;
-	for (int i = 0; i < n; i++) {
-		Player* player = new Player(names[i], 1000, i+1);
-		Players.push_back(player);
-	}
-	//Test
-	for (int i = 0; i < n; i++) {
-		cout << "Name: " << Players[i]->getName() 
-			 << "\tID: " << Players[i]->getID() 
-			 << "\tRank: " << Players[i]->getRank() 
-			 << endl;
+template <typename T>
+void randVector(vector<T>& vec) {
+	srand((unsigned)time(NULL));
+	for (int i = 0; i < vec.size(); i++) {
+		swap(vec[i], vec[rand() % vec.size()]);
 	}
 }
 
-void createHeroes(int n) {
+void createPlayers(vector<Player>& arr, int n) {
 	string names[12] = { "Tom", "Jame", "Stive", "John", "Rick", "Fred", "Eric", "Diego", "Luke", "Philip", "Oliver", "Jake" };
-	vector<Hero*> Heroes;
-	srand(time(NULL));
+	for (int i = 0; i < n; i++) {
+		Player player = Player(names[i], 1000, i + 1);
+		arr.push_back(player);
+	}
+}
+
+void createHeroes(vector<Hero>& arr, int n) {
+	vector<string> names = { "Tom", "Jame", "Stive", "John", "Rick", "Fred", "Eric", "Diego", "Luke", "Philip", "Oliver", "Jake" };
+	randVector(names);
+	srand((unsigned)time(NULL));
 	for (int i = 0; i < n; i++) {
 		int hp = rand() % 100 + 1;
 		int damage = rand() % 10 + 1;
 		int speed = rand() % 5 + 1;
-		Hero* hero = new Hero(names[i], hp, damage, speed);
-		Heroes.push_back(hero);
-	}
-	//Test
-	for (int i = 0; i < n; i++) {
-		cout << "Name: " << Heroes[i]->getName() 
-			 << "\tHP: " << Heroes[i]->getHP() 
-			 << "\tDamage: " << Heroes[i]->getDamage() 
-			 << "\tSpeed: " << Heroes[i]->getSpeed() 
-			 << endl;
+		Hero hero = Hero(names[i], hp, damage, speed);
+		arr.push_back(hero);
 	}
 }
+
+void createTeamParts(vector<TeamPart>& arr, vector<Player>& players, vector<Hero>& heroes) {
+	randVector(players);
+	for (int i = 0; i < players.size(); i++)
+	{
+		TeamPart teamPart = TeamPart(players[i], heroes[i]);
+		arr.push_back(teamPart);
+	}	
+}
+
 
 
 
 int main() {
 
-	createPlayers(10);
+	vector<Player> players;
+	vector<Hero> heroes;
+	vector<TeamPart> TeamParts;
+
+
+	createPlayers(players, 10);
+	createHeroes(heroes, 10);
+	createTeamParts(TeamParts, players, heroes);
+
+	for (int i = 0; i < 10; i++) {
+		cout << "Name: " << TeamParts[i].player.getName()
+			<< "\tID: " << TeamParts[i].player.getID()
+			<< "\tRank: " << TeamParts[i].player.getRank()
+			<< endl << endl;
+		cout << "Name: " << TeamParts[i].hero.getName()
+			<< "\tHP: " << TeamParts[i].hero.getHP()
+			<< "\tDamage: " << TeamParts[i].hero.getDamage()
+			<< "\tSpeed: " << TeamParts[i].hero.getSpeed()
+			<< endl << endl
+			<< "=========================================="
+			<< endl << endl;
+	}
 	cout << endl;
-	createHeroes(10);
 	
+
 	return 0;
 	system("pause");
 }
