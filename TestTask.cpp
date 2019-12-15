@@ -102,15 +102,7 @@ public:
 class PlayerManager {
 public:
 	vector<Player> players;
-	//Test
-	/*void sortById() {
-		for (int i = 0; i < players.size() - 1; i++) {
-			for (int j = 0; j < players.size() - i - 1; j++) {
-				if (players[i].getID() > players[i + 1].getID()) swap(players[i], players[i + 1]);
-			}
-		}
-	}*/
-
+	
 	void generatePlayers(int n) {
 		vector<string> names = { 
 			"Tom", "Jame", "Stive", "John", "Rick", "Fred", "Eric", "Diego", "Luke", "Philip", "Oliver", "Jake"
@@ -269,11 +261,11 @@ class Session {
 	vector<TeamPart> TeamRed;
 	vector<TeamPart> TeamBlue;
 	vector<Hero> newHeroes;
-	time_t StartTime = time(0);
-	string arr[3] = { "Tie", "Blue", "Red" };
+	time_t StartTime;
+	
 	int winner = -1;
 
-	void getWinner() {
+	void chooseWinner() {
 		int hpBlue = 0, hpRed = 0, damageBlue = 0, damageRed = 0;
 		//Calculate hp and damage
 		for (size_t i = 0; i < TeamBlue.size(); i++) {
@@ -340,15 +332,17 @@ class Session {
 		}
 	}
 
-public:
+	
 
+public:
+	string arr[3] = { "Tie", "Blue", "Red" };
 	//Init
 	Session(vector<Player>& players, vector<Hero>& heroes) {
 		// Copy heroes to the new array
 		for (size_t i = 0; i < heroes.size(); i++) {
 			newHeroes.push_back(heroes[i]);
 		}
-
+		
 		randVector(newHeroes);
 
 		//Add players and heroes to the Lobby
@@ -368,6 +362,9 @@ public:
 				TeamRed.push_back(Lobby[i]);
 			}
 		}
+
+		//For randomizing
+		Sleep(1000);
 	}
 
 	~Session() {
@@ -424,48 +421,68 @@ public:
 	}
 
 	void gameStart() {
-		getWinner();
+		StartTime = time(0);
+		chooseWinner();
 		AnnounceTheWinner();
 		addRank();
 		removeRank();
 	}
 
-	void getTime() {
+	time_t getTime() {
+		return StartTime;
+	}
+
+	void showTime() {	
 		tm* ltm = localtime(&StartTime);
-		cout << "Year: " << 1900 + ltm->tm_year << endl;
-		cout << "Month: " << 1 + ltm->tm_mon << endl;
-		cout << "Day: " << ltm->tm_mday << endl;
+		cout << "Date: " << ltm->tm_mday << "/" << 1 + ltm->tm_mon << "/" << 1900 + ltm->tm_year << "\t";
 		cout << "Time: " << ltm->tm_hour << ":";
 		cout << ltm->tm_min << ":";
-		cout << ltm->tm_sec << endl;
+		cout << ltm->tm_sec << endl;		
+	}
+
+	int getWinner() {
+		return winner;
 	}
 };
 
 class SessionManager {
 	vector<Session> sessions;
+	time_t time;
+public:	
+	SessionManager(vector<Player>& players, vector<Hero>& heroes, int num) {
+		for (size_t i = 0; i < num; i++) {
+			Session session(players, heroes);
+			session.gameStart();
+			session.showTime();
+			session.showTeamBlue();
+			session.showTeamRed();
+			sessions.push_back(session);
+		}
+	}
+
+	void ListOfSessions() {
+		for (size_t i = 0; i < sessions.size(); i++) {
+			cout << i + 1 << ". ";
+			sessions[i].showTime();
+			int winner = sessions[i].getWinner();
+			cout << sessions[i].arr[winner] << " won" << endl;
+		}
+	}	
 };
 
 
-
 int main() {
+	
 	PlayerManager pm;
 	HeroManager hm;
 	pm.generatePlayers(10);
 	hm.createHeroes(10);
 
-
 	Session session(pm.players, hm.heroes);
 
-	session.showTeamBlue();
-	session.showTeamRed();
-
-
-	session.gameStart();
-	session.getTime();
-
-	session.showTeamBlue();
-	session.showTeamRed();
-
+	SessionManager sm(pm.players, hm.heroes, 5);
+	sm.ListOfSessions();
+	
 
 	return 0;
 	system("pause");
