@@ -18,7 +18,6 @@ void randVector(vector<T>& vec) {
 	}
 }
 
-
 class Player {
 private:
 	string name;
@@ -53,13 +52,14 @@ public:
 	string getName() {
 		return name;
 	}
+
 	int getRank() {
 		return rank;
 	}
+
 	int getID() {
 		return id;
 	}
-
 };
 
 class Hero {
@@ -261,7 +261,7 @@ class Session {
 	vector<TeamPart> TeamRed;
 	vector<TeamPart> TeamBlue;
 	vector<Hero> newHeroes;
-	time_t StartTime;
+	time_t StartTime = 0;
 	
 	int winner = -1;
 
@@ -331,8 +331,6 @@ class Session {
 			break;
 		}
 	}
-
-	
 
 public:
 	string arr[3] = { "Tie", "Blue", "Red" };
@@ -447,10 +445,11 @@ public:
 
 class SessionManager {
 	vector<Session> sessions;
-	time_t time;
+	time_t time = 0;	
+
 public:	
 	SessionManager(vector<Player>& players, vector<Hero>& heroes, int num) {
-		for (size_t i = 0; i < num; i++) {
+		for (int i = 0; i < num; i++) {
 			Session session(players, heroes);
 			session.gameStart();
 			session.showTime();
@@ -469,7 +468,6 @@ public:
 		}
 	}	
 };
-
 
 int main() {
 	
