@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
@@ -263,16 +264,84 @@ public:
 	}
 };
 
-
 class Session {
 	vector<TeamPart> Lobby;
 	vector<TeamPart> TeamRed;
 	vector<TeamPart> TeamBlue;
 	vector<Hero> newHeroes;
-	/*int StartTime;*///???
-	string Winner; //???
+	time_t StartTime = time(0);
+	string arr[3] = { "Tie", "Blue", "Red" };
+	int winner = -1;
+
+	void getWinner() {
+		int hpBlue = 0, hpRed = 0, damageBlue = 0, damageRed = 0;
+		//Calculate hp and damage
+		for (size_t i = 0; i < TeamBlue.size(); i++) {
+			hpBlue += TeamBlue[i].hero.getHP();
+			damageBlue += TeamBlue[i].hero.getDamage();
+		}
+		for (size_t i = 0; i < TeamRed.size(); i++) {
+			hpRed += TeamRed[i].hero.getHP();
+			damageRed += TeamRed[i].hero.getDamage();
+		}
+
+
+		if (hpBlue - damageRed > hpRed - damageBlue) {
+			winner = 1;//Blue
+		}
+		else if (hpBlue - damageRed == hpRed - damageBlue) {
+			winner = 0;//Tie
+		}
+		else {
+			winner = 2;//Red
+		}
+	}
+
+	void AnnounceTheWinner() {
+		if (winner > 0) {
+			cout << arr[winner] << " won this game" << endl;
+		}
+		else {
+			cout << arr[winner] << endl;
+		}
+	}
+
+	void addRank() {
+		switch (winner) {
+		case 1:
+			for (size_t i = 0; i < TeamBlue.size(); i++)
+			{
+				TeamBlue[i].player.addRank();
+			}
+			break;
+		case 2:
+			for (size_t i = 0; i < TeamRed.size(); i++)
+			{
+				TeamRed[i].player.addRank();
+			}
+			break;
+		}
+	}
+
+	void removeRank() {
+		switch (winner) {
+		case 1:
+			for (size_t i = 0; i < TeamRed.size(); i++)
+			{
+				TeamRed[i].player.subRank();
+			}
+			break;
+		case 2:
+			for (size_t i = 0; i < TeamBlue.size(); i++)
+			{
+				TeamBlue[i].player.subRank();
+			}
+			break;
+		}
+	}
 
 public:
+
 	//Init
 	Session(vector<Player>& players, vector<Hero>& heroes) {
 		// Copy heroes to the new array
@@ -308,45 +377,77 @@ public:
 		Lobby.clear();
 	}
 	//Test
-	/*void showRed() {
-		for (int i = 0; i < TeamRed.size(); i++)
+	void showTeamRed() {
+		cout << endl
+			<< "                  Team Red" << endl << endl
+			<< "================================================" << endl << endl;
+		for (size_t i = 0; i < TeamRed.size(); i++)
 		{
-			cout << TeamRed[i].player.getName() << endl;
-			cout << TeamRed[i].hero.getName() << endl << endl;
+			//Show player info
+			cout << "Name: " << TeamRed[i].player.getName()
+				 << "\tID: " << TeamRed[i].player.getID()
+				 << "\tRank: " << TeamRed[i].player.getRank()
+				 << endl;
+			//Shwow hero info
+			cout << "Name: " << TeamRed[i].hero.getName()
+				 << "\tHP: " << TeamRed[i].hero.getHP()
+				 << "\tDamage: " << TeamRed[i].hero.getDamage()
+				 << "\tSpeed: " << TeamRed[i].hero.getSpeed()
+				 << endl
+				 << (i == TeamRed.size() - 1 ? "" : "------------------------------------------------")
+				 << endl;
 		}
-	}*/
-
-	void getWinner() {
-		int hpBlue = 0, hpRed = 0, damageBlue = 0, damageRed = 0;
-		for (size_t i = 0; i < TeamBlue.size(); i++) {
-			hpBlue += TeamBlue[i].hero.getHP();
-			damageBlue += TeamBlue[i].hero.getDamage();
-		}
-		for (size_t i = 0; i < TeamRed.size(); i++) {
-			hpRed += TeamRed[i].hero.getHP();
-			damageRed += TeamRed[i].hero.getDamage();
-		}
-		
-
-		if (hpBlue - damageRed > hpRed - damageBlue) {
-			Winner = "Blue";
-		}
-		else if (hpBlue - damageRed == hpRed - damageBlue) {
-			Winner = "Tie";
-		}
-		else {
-			Winner = "Red";
-		}
+		cout << "================================================" << endl << endl;
 	}
 
-	void AnnounceTheWinner() {
-		cout << Winner << " won this game" << endl;
+	void showTeamBlue() {
+		cout << endl 
+			<< "                  Team Blue" << endl << endl
+			<< "================================================" << endl << endl;
+		for (size_t i = 0; i < TeamBlue.size(); i++)
+		{	
+			//Show player info
+			cout << "Name: " << TeamBlue[i].player.getName()
+				 << "\tID: " << TeamBlue[i].player.getID()
+				 << "\tRank: " << TeamBlue[i].player.getRank()
+				 << endl;
+			//Shwow hero info
+			cout << "Name: " << TeamBlue[i].hero.getName()
+				 << "\tHP: " << TeamBlue[i].hero.getHP()
+				 << "\tDamage: " << TeamBlue[i].hero.getDamage()
+				 << "\tSpeed: " << TeamBlue[i].hero.getSpeed()
+				 << endl
+				 << (i == TeamBlue.size() - 1 ? "" : "------------------------------------------------")
+				 << endl;
+		}
+		cout << "================================================" << endl << endl;
 	}
 
+	void gameStart() {
+		getWinner();
+		AnnounceTheWinner();
+		addRank();
+		removeRank();
+	}
+
+	void getTime() {
+		tm* ltm = localtime(&StartTime);
+		cout << "Year: " << 1900 + ltm->tm_year << endl;
+		cout << "Month: " << 1 + ltm->tm_mon << endl;
+		cout << "Day: " << ltm->tm_mday << endl;
+		cout << "Time: " << ltm->tm_hour << ":";
+		cout << ltm->tm_min << ":";
+		cout << ltm->tm_sec << endl;
+	}
 };
 
-int main() {
+class SessionManager {
+	vector<Session> sessions;
+};
 
+
+
+int main() {
 	PlayerManager pm;
 	HeroManager hm;
 	pm.generatePlayers(10);
@@ -355,8 +456,16 @@ int main() {
 
 	Session session(pm.players, hm.heroes);
 
-	session.getWinner();
-	session.AnnounceTheWinner();
+	session.showTeamBlue();
+	session.showTeamRed();
+
+
+	session.gameStart();
+	session.getTime();
+
+	session.showTeamBlue();
+	session.showTeamRed();
+
 
 	return 0;
 	system("pause");
