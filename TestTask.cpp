@@ -339,7 +339,7 @@ class Session {
 		}
 	}
 
-	int chechTeams() {
+	bool checkTeams() {
 		int mmrRed = 0, mmrBlue = 0;
 		for (size_t i = 0; i < TeamRed.size(); i++) {
 			mmrRed += TeamRed[i].player.getRank();
@@ -347,7 +347,25 @@ class Session {
 		for (size_t i = 0; i < TeamBlue.size(); i++) {
 			mmrBlue += TeamBlue[i].player.getRank();
 		}
-		if(mmrBlue - mmrRed >= fabs(100))
+		if (mmrBlue - mmrRed >= fabs(100)) {
+			return false;
+		}
+		else return true;
+	}
+
+	bool checkPlayers() {
+		for (size_t i = 0; i < TeamBlue.size(); i++)
+		{
+			int maxBlue = 0, maxRed = 0, minBlue = 999999999, minRed = 999999999;
+
+			if (TeamBlue[i].player.getRank() > maxBlue) maxBlue = TeamBlue[i].player.getRank();
+			if (TeamRed[i].player.getRank() > maxRed) maxRed = TeamRed[i].player.getRank();
+			if (TeamBlue[i].player.getRank() < minBlue) minBlue = TeamBlue[i].player.getRank();
+			if (TeamRed[i].player.getRank() < minRed) minRed = TeamRed[i].player.getRank();
+
+			if((maxBlue - minBlue > 200) || (maxRed - minRed > 200)) return false;
+			else return true;			
+		}
 	}
 
 public:
@@ -368,16 +386,12 @@ public:
 		}
 
 		randVector(Lobby);
+		// Need test!!!
+		do {
+			AddTeamPart();
+		} while (!checkTeams() && !checkPlayers());
 
-		for (int i = 0, k = 1; i < k; i++) {
-			int mmrBlue = 0, mmrRed = 0;
-
-			if () {
-				AddTeamPart();
-			}
 			
-		}
-
 		//For randomizing
 		Sleep(1000);
 	}
