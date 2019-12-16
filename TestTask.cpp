@@ -154,10 +154,9 @@ public:
 				//End test
 				return players[i];
 			}
-			else continue;
 		}
 		//???
-		cout << "There is no player with this id!" << endl;
+		/*cout << "There is no player with this id!" << endl;*/
 	}
 
 	void AddPlayer(string name) {
@@ -248,7 +247,7 @@ class TeamPart {
 public:
 	Player player;
 	Hero hero;
-	
+
 	TeamPart(const Player& player, const Hero& hero) {
 		this->player = player;
 		this->hero = hero;
@@ -301,29 +300,31 @@ class Session {
 		switch (winner) {
 		case 1:
 			for (size_t i = 0; i < TeamBlue.size(); i++) {
-				int idWinner = TeamBlue[i].player.getID() - 1;
+				int idWinner = TeamBlue[i].player.getID();
 				int idLoser = TeamRed[i].player.getID() - 1;
-				players[idWinner].addRank();
-				players[idLoser].subRank();
+				for (int i = 0; i < players.size(); i++) {
+					if (players[i].getID() == idWinner) {
+						players[i].addRank();
+					}
+					if (players[i].getID() == idLoser) {
+						players[i].subRank();
+					}
+				}
 			}
-			/*for (size_t i = 0; i < TeamBlue.size(); i++)
-			{
-				TeamBlue[i].player.addRank();
-				TeamRed[i].player.subRank();
-			}*/
 			break;
 		case 2:
 			for (size_t i = 0; i < TeamRed.size(); i++) {
-				int idWinner = TeamRed[i].player.getID() - 1;
+				int idWinner = TeamRed[i].player.getID();
 				int idLoser = TeamBlue[i].player.getID() - 1;
-				players[idWinner].addRank();
-				players[idLoser].subRank();
+				for (int i = 0; i < players.size(); i++) {
+					if (players[i].getID() == idWinner) {
+						players[i].addRank();
+					}
+					if (players[i].getID() == idLoser) {
+						players[i].subRank();
+					}
+				}
 			}
-			/*for (size_t i = 0; i < TeamRed.size(); i++)
-			{
-				TeamRed[i].player.addRank();
-				TeamBlue[i].player.subRank();
-			}*/
 			break;
 		}
 	}
@@ -343,30 +344,36 @@ class Session {
 		int mmrRed = 0, mmrBlue = 0;
 		for (size_t i = 0; i < TeamRed.size(); i++) {
 			mmrRed += TeamRed[i].player.getRank();
-		}
-		for (size_t i = 0; i < TeamBlue.size(); i++) {
 			mmrBlue += TeamBlue[i].player.getRank();
 		}
-		if (mmrBlue - mmrRed >= fabs(100)) {
-			return false;
-		}
-		else return true;
+		if (fabs(mmrBlue - mmrRed) >= 100)	return false;
+		return true;
 	}
 
-	bool checkPlayers() {
+
+	//Test
+	/*bool checkPlayers() {
+		int maxBlue = 0, maxRed = 0, minBlue = 999999999, minRed = 999999999;
+
 		for (size_t i = 0; i < TeamBlue.size(); i++)
 		{
-			int maxBlue = 0, maxRed = 0, minBlue = 999999999, minRed = 999999999;
-
 			if (TeamBlue[i].player.getRank() > maxBlue) maxBlue = TeamBlue[i].player.getRank();
-			if (TeamRed[i].player.getRank() > maxRed) maxRed = TeamRed[i].player.getRank();
 			if (TeamBlue[i].player.getRank() < minBlue) minBlue = TeamBlue[i].player.getRank();
-			if (TeamRed[i].player.getRank() < minRed) minRed = TeamRed[i].player.getRank();
 
-			if((maxBlue - minBlue > 200) || (maxRed - minRed > 200)) return false;
-			else return true;			
+			if (TeamRed[i].player.getRank() > maxRed) maxRed = TeamRed[i].player.getRank();
+			if (TeamRed[i].player.getRank() < minRed) minRed = TeamRed[i].player.getRank();
 		}
-	}
+
+		//Test
+		cout << "MaxBlue: " << maxBlue << endl;
+		cout << "minBlue: " << minBlue << endl;
+
+		cout << "maxRed: " << maxRed << endl;		
+		cout << "minRed: " << minRed << endl << endl;
+		if (maxBlue - minBlue <= 200 || maxRed - minRed <= 200) return false;
+		
+		return true;
+	}*/
 
 public:
 	string arr[3] = { "Tie", "Blue", "Red" };
@@ -385,13 +392,15 @@ public:
 			Lobby.push_back(tp);
 		}
 
-		randVector(Lobby);
-		// Need test!!!
-		do {
-			AddTeamPart();
-		} while (!checkTeams() && !checkPlayers());
+		AddTeamPart();
 
-			
+		while (!checkTeams()) {
+			randVector(Lobby);
+			TeamBlue.clear();
+			TeamRed.clear();
+			AddTeamPart();
+		}
+
 		//For randomizing
 		Sleep(1000);
 	}
@@ -478,9 +487,7 @@ class SessionManager {
 	time_t time = 0;
 
 public:
-	SessionManager() {
-		
-	}
+	SessionManager() {}
 
 	void ListOfSessions() {
 		for (size_t i = 0; i < sessions.size(); i++) {
@@ -514,13 +521,14 @@ int main() {
 
 	Session session(pm.players, hm.heroes);
 
-	sm.PerformGameSession(pm.players, hm.heroes, 5);
+	sm.PerformGameSession(pm.players, hm.heroes, 20);
 	sm.ListOfSessions();
 
 
 	/*TeamPart tp(pm.players[0], hm.heroes[0]);*/
-	
+
 	pm.ListOfPlayers();
+
 
 	system("pause");
 	return 0;
