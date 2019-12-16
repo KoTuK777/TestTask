@@ -6,7 +6,8 @@
 #include <conio.h>
 #include <string>
 #include "string.h"
-#include <vector>
+#include <vector>  
+#include <math.h>
 
 using namespace std;
 
@@ -21,8 +22,8 @@ void randVector(vector<T>& vec) {
 class Player {
 private:
 	string name;
-	int rank = 0;
-	int id = 0;
+	int rank;
+	int id;
 
 public:
 	void setName(string name) {
@@ -40,7 +41,7 @@ public:
 	Player() {
 		name = "unknown";
 		rank = 1000;
-		id = rank % 1000;
+		id = 0;
 	}
 
 	Player(string name, int rank, int id) {
@@ -89,7 +90,6 @@ public:
 	}
 	int getHP() {
 		return hp;
-
 	}
 	int getDamage() {
 		return damage;
@@ -102,9 +102,9 @@ public:
 class PlayerManager {
 public:
 	vector<Player> players;
-	
+
 	void generatePlayers(int n) {
-		vector<string> names = { 
+		vector<string> names = {
 			"Tom", "Jame", "Stive", "John", "Rick", "Fred", "Eric", "Diego", "Luke", "Philip", "Oliver", "Jake"
 		};
 		randVector(names);
@@ -118,11 +118,11 @@ public:
 		cout << "==================================" << endl << endl;
 		for (size_t i = 0; i < players.size(); i++) {
 			cout << "Name: " << players[i].getName()
-				 << "\tID: " << players[i].getID()
-				 << "\tRank: " << players[i].getRank()
-				 << endl << endl 
-				 << "=================================="
-				 << endl << endl;
+				<< "\tID: " << players[i].getID()
+				<< "\tRank: " << players[i].getRank()
+				<< endl << endl
+				<< "=================================="
+				<< endl << endl;
 		}
 	}
 
@@ -168,7 +168,7 @@ public:
 
 	void RemovePlayer(int id) {
 		for (size_t i = 0; i < players.size(); i++) {
-			if(players[i].getID() == id) players.erase(players.begin() + i);
+			if (players[i].getID() == id) players.erase(players.begin() + i);
 			break;
 		}
 	}
@@ -179,7 +179,7 @@ public:
 	vector<Hero> heroes;
 
 	void createHeroes(int n) {
-		vector<string> names = { 
+		vector<string> names = {
 			"Tom", "Jame", "Stive", "John", "Rick", "Fred", "Eric", "Diego", "Luke", "Philip", "Oliver", "Jake"
 		};
 		randVector(names);
@@ -248,8 +248,7 @@ class TeamPart {
 public:
 	Player player;
 	Hero hero;
-
-	TeamPart() {}
+	
 	TeamPart(const Player& player, const Hero& hero) {
 		this->player = player;
 		this->hero = hero;
@@ -262,7 +261,7 @@ class Session {
 	vector<TeamPart> TeamBlue;
 	vector<Hero> newHeroes;
 	time_t StartTime = 0;
-	
+
 	int winner = -1;
 
 	void chooseWinner() {
@@ -276,7 +275,6 @@ class Session {
 			hpRed += TeamRed[i].hero.getHP();
 			damageRed += TeamRed[i].hero.getDamage();
 		}
-
 
 		if (hpBlue - damageRed > hpRed - damageBlue) {
 			winner = 1;//Blue
@@ -298,38 +296,58 @@ class Session {
 		}
 	}
 
-	void addRank() {
+	void ChangeRank(vector<Player>& players) {
+		//Test with bags
 		switch (winner) {
 		case 1:
-			for (size_t i = 0; i < TeamBlue.size(); i++)
+			for (size_t i = 0; i < TeamBlue.size(); i++) {
+				int idWinner = TeamBlue[i].player.getID() - 1;
+				int idLoser = TeamRed[i].player.getID() - 1;
+				players[idWinner].addRank();
+				players[idLoser].subRank();
+			}
+			/*for (size_t i = 0; i < TeamBlue.size(); i++)
 			{
 				TeamBlue[i].player.addRank();
-			}
+				TeamRed[i].player.subRank();
+			}*/
 			break;
 		case 2:
-			for (size_t i = 0; i < TeamRed.size(); i++)
+			for (size_t i = 0; i < TeamRed.size(); i++) {
+				int idWinner = TeamRed[i].player.getID() - 1;
+				int idLoser = TeamBlue[i].player.getID() - 1;
+				players[idWinner].addRank();
+				players[idLoser].subRank();
+			}
+			/*for (size_t i = 0; i < TeamRed.size(); i++)
 			{
 				TeamRed[i].player.addRank();
-			}
+				TeamBlue[i].player.subRank();
+			}*/
 			break;
 		}
 	}
 
-	void removeRank() {
-		switch (winner) {
-		case 1:
-			for (size_t i = 0; i < TeamRed.size(); i++)
-			{
-				TeamRed[i].player.subRank();
+	void AddTeamPart() {
+		for (size_t i = 0; i < Lobby.size(); i++) {
+			if (i < 5) {
+				TeamBlue.push_back(Lobby[i]);
 			}
-			break;
-		case 2:
-			for (size_t i = 0; i < TeamBlue.size(); i++)
-			{
-				TeamBlue[i].player.subRank();
+			else {
+				TeamRed.push_back(Lobby[i]);
 			}
-			break;
 		}
+	}
+
+	int chechTeams() {
+		int mmrRed = 0, mmrBlue = 0;
+		for (size_t i = 0; i < TeamRed.size(); i++) {
+			mmrRed += TeamRed[i].player.getRank();
+		}
+		for (size_t i = 0; i < TeamBlue.size(); i++) {
+			mmrBlue += TeamBlue[i].player.getRank();
+		}
+		if(mmrBlue - mmrRed >= fabs(100))
 	}
 
 public:
@@ -340,7 +358,7 @@ public:
 		for (size_t i = 0; i < heroes.size(); i++) {
 			newHeroes.push_back(heroes[i]);
 		}
-		
+
 		randVector(newHeroes);
 
 		//Add players and heroes to the Lobby
@@ -351,14 +369,13 @@ public:
 
 		randVector(Lobby);
 
-		//Add TeamPart to the teams
-		for (size_t i = 0; i < Lobby.size(); i++) {
-			if (i < 5) {
-				TeamBlue.push_back(Lobby[i]);
+		for (int i = 0, k = 1; i < k; i++) {
+			int mmrBlue = 0, mmrRed = 0;
+
+			if () {
+				AddTeamPart();
 			}
-			else {
-				TeamRed.push_back(Lobby[i]);
-			}
+			
 		}
 
 		//For randomizing
@@ -380,62 +397,61 @@ public:
 		{
 			//Show player info
 			cout << "Name: " << TeamRed[i].player.getName()
-				 << "\tID: " << TeamRed[i].player.getID()
-				 << "\tRank: " << TeamRed[i].player.getRank()
-				 << endl;
+				<< "\tID: " << TeamRed[i].player.getID()
+				<< "\tRank: " << TeamRed[i].player.getRank()
+				<< endl;
 			//Shwow hero info
 			cout << "Name: " << TeamRed[i].hero.getName()
-				 << "\tHP: " << TeamRed[i].hero.getHP()
-				 << "\tDamage: " << TeamRed[i].hero.getDamage()
-				 << "\tSpeed: " << TeamRed[i].hero.getSpeed()
-				 << endl
-				 << (i == TeamRed.size() - 1 ? "" : "------------------------------------------------")
-				 << endl;
+				<< "\tHP: " << TeamRed[i].hero.getHP()
+				<< "\tDamage: " << TeamRed[i].hero.getDamage()
+				<< "\tSpeed: " << TeamRed[i].hero.getSpeed()
+				<< endl
+				<< (i == TeamRed.size() - 1 ? "" : "------------------------------------------------")
+				<< endl;
 		}
 		cout << "================================================" << endl << endl;
 	}
 
 	void showTeamBlue() {
-		cout << endl 
+		cout << endl
 			<< "                  Team Blue" << endl << endl
 			<< "================================================" << endl << endl;
 		for (size_t i = 0; i < TeamBlue.size(); i++)
-		{	
+		{
 			//Show player info
 			cout << "Name: " << TeamBlue[i].player.getName()
-				 << "\tID: " << TeamBlue[i].player.getID()
-				 << "\tRank: " << TeamBlue[i].player.getRank()
-				 << endl;
+				<< "\tID: " << TeamBlue[i].player.getID()
+				<< "\tRank: " << TeamBlue[i].player.getRank()
+				<< endl;
 			//Shwow hero info
 			cout << "Name: " << TeamBlue[i].hero.getName()
-				 << "\tHP: " << TeamBlue[i].hero.getHP()
-				 << "\tDamage: " << TeamBlue[i].hero.getDamage()
-				 << "\tSpeed: " << TeamBlue[i].hero.getSpeed()
-				 << endl
-				 << (i == TeamBlue.size() - 1 ? "" : "------------------------------------------------")
-				 << endl;
+				<< "\tHP: " << TeamBlue[i].hero.getHP()
+				<< "\tDamage: " << TeamBlue[i].hero.getDamage()
+				<< "\tSpeed: " << TeamBlue[i].hero.getSpeed()
+				<< endl
+				<< (i == TeamBlue.size() - 1 ? "" : "------------------------------------------------")
+				<< endl;
 		}
 		cout << "================================================" << endl << endl;
 	}
 
-	void gameStart() {
+	void gameStart(vector<Player>& players) {
 		StartTime = time(0);
 		chooseWinner();
 		AnnounceTheWinner();
-		addRank();
-		removeRank();
+		ChangeRank(players);
 	}
 
 	time_t getTime() {
 		return StartTime;
 	}
 
-	void showTime() {	
+	void showTime() {
 		tm* ltm = localtime(&StartTime);
 		cout << "Date: " << ltm->tm_mday << "/" << 1 + ltm->tm_mon << "/" << 1900 + ltm->tm_year << "\t";
 		cout << "Time: " << ltm->tm_hour << ":";
 		cout << ltm->tm_min << ":";
-		cout << ltm->tm_sec << endl;		
+		cout << ltm->tm_sec << endl;
 	}
 
 	int getWinner() {
@@ -445,18 +461,11 @@ public:
 
 class SessionManager {
 	vector<Session> sessions;
-	time_t time = 0;	
+	time_t time = 0;
 
-public:	
-	SessionManager(vector<Player>& players, vector<Hero>& heroes, int num) {
-		for (int i = 0; i < num; i++) {
-			Session session(players, heroes);
-			session.gameStart();
-			session.showTime();
-			session.showTeamBlue();
-			session.showTeamRed();
-			sessions.push_back(session);
-		}
+public:
+	SessionManager() {
+		
 	}
 
 	void ListOfSessions() {
@@ -466,22 +475,39 @@ public:
 			int winner = sessions[i].getWinner();
 			cout << sessions[i].arr[winner] << " won" << endl;
 		}
-	}	
+	}
+
+	void PerformGameSession(vector<Player>& players, vector<Hero>& heroes, int num) {
+		for (int i = 0; i < num; i++) {
+			Session session(players, heroes);
+			session.gameStart(players);
+			session.showTime();
+			session.showTeamBlue();
+			session.showTeamRed();
+			sessions.push_back(session);
+		}
+	}
 };
 
 int main() {
-	
+
 	PlayerManager pm;
 	HeroManager hm;
+	SessionManager sm;
 	pm.generatePlayers(10);
 	hm.createHeroes(10);
+	pm.ListOfPlayers();
 
 	Session session(pm.players, hm.heroes);
 
-	SessionManager sm(pm.players, hm.heroes, 5);
+	sm.PerformGameSession(pm.players, hm.heroes, 5);
 	sm.ListOfSessions();
-	
 
-	return 0;
+
+	/*TeamPart tp(pm.players[0], hm.heroes[0]);*/
+	
+	pm.ListOfPlayers();
+
 	system("pause");
+	return 0;
 }
