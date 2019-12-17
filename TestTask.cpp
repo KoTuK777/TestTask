@@ -111,7 +111,7 @@ public:
 		randVector(names);
 		for (int i = 0; i < n; i++) {
 			Player player = Player(names[i], 1000, i + 1);
-			players.emplace_back(player);
+			players.push_back(player);
 		}
 	}
 
@@ -163,7 +163,7 @@ public:
 	void AddPlayer(string name) {
 		int id = players[players.size() - 1].getID() + 1;
 		Player player = Player(name, 1000, id);
-		players.emplace_back(player);
+		players.push_back(player);
 	}
 
 	void RemovePlayer(int id) {
@@ -189,7 +189,7 @@ public:
 			int damage = rand() % 10 + 1;
 			int speed = rand() % 5 + 1;
 			Hero hero = Hero(names[i], hp, damage, speed);
-			heroes.emplace_back(hero);
+			heroes.push_back(hero);
 		}
 	}
 
@@ -232,7 +232,7 @@ public:
 			}
 		}
 		Hero hero = Hero(name, hp, damage, speed);
-		heroes.emplace_back(hero);
+		heroes.push_back(hero);
 	}
 
 	void RemovePlayer(string name) {
@@ -333,10 +333,10 @@ class Session {
 	void AddTeamPart() {
 		for (size_t i = 0; i < Lobby.size(); i++) {
 			if (i < 5) {
-				TeamBlue.emplace_back(Lobby[i]);
+				TeamBlue.push_back(Lobby[i]);
 			}
 			else {
-				TeamRed.emplace_back(Lobby[i]);
+				TeamRed.push_back(Lobby[i]);
 			}
 		}
 	}
@@ -385,7 +385,7 @@ public:
 	Session(vector<Player>& players, vector<Hero>& heroes) {
 		// Copy heroes to the new array
 		for (size_t i = 0; i < heroes.size(); i++) {
-			newHeroes.emplace_back(heroes[i]);
+			newHeroes.push_back(heroes[i]);
 		}
 
 		randVector(players);
@@ -394,7 +394,7 @@ public:
 		//Add players and heroes to the Lobby
 		for (size_t i = 0; i < players.size(); i++) {
 			TeamPart tp = TeamPart(players[i], newHeroes[i]);
-			Lobby.emplace_back(tp);
+			Lobby.push_back(tp);
 		}
 
 		AddTeamPart();
@@ -571,7 +571,7 @@ public:
 			session.showTime();
 			session.showTeamBlue();
 			session.showTeamRed();
-			sessions.emplace_back(session);
+			sessions.push_back(session);
 		}
 	}
 };
