@@ -108,14 +108,26 @@ public:
 		vector<string> names = {
 			"Tom", "Jame", "Stive", "John", "Rick", "Fred", "Eric", "Diego", "Luke", "Philip", "Oliver", "Jake"
 		};
-		randVector(names);
+		srand((unsigned)time(NULL));
 		for (int i = 0; i < n; i++) {
-			Player player = Player(names[i], 1000, i + 1);
+			int idx = rand() % names.size();
+			Player player = Player(names[idx], 1000, i + 1);
 			players.push_back(player);
 		}
 	}
 
+	void sortPlayersById() {
+		for (size_t i = 0; i < players.size() - 1; i++)
+		{
+			for (size_t j = 0; j < players.size() - i - 1; j++)
+			{
+				if (players[j].getID() > players[j + 1].getID()) swap(players[j], players[j + 1]);
+			}
+		}
+	}
+
 	void ListOfPlayers() {
+		sortPlayersById();
 		cout << "==================================" << endl << endl;
 		for (size_t i = 0; i < players.size(); i++) {
 			cout << "Name: " << players[i].getName()
@@ -172,6 +184,8 @@ public:
 			break;
 		}
 	}
+
+	
 };
 
 class HeroManager {
@@ -182,13 +196,13 @@ public:
 		vector<string> names = {
 			"Tom", "Jame", "Stive", "John", "Rick", "Fred", "Eric", "Diego", "Luke", "Philip", "Oliver", "Jake"
 		};
-		randVector(names);
 		srand((unsigned)time(NULL));
 		for (int i = 0; i < n; i++) {
+			int idx = rand() % names.size();
 			int hp = rand() % 100 + 1;
 			int damage = rand() % 10 + 1;
 			int speed = rand() % 5 + 1;
-			Hero hero = Hero(names[i], hp, damage, speed);
+			Hero hero = Hero(names[idx], hp, damage, speed);
 			heroes.push_back(hero);
 		}
 	}
@@ -297,37 +311,27 @@ class Session {
 	}
 
 	void ChangeRank(vector<Player>& players) {
-		//Test with bags
-		switch (winner) {
-		case 1:
-			for (size_t i = 0; i < TeamBlue.size(); i++) {
-				int idWinner = TeamBlue[i].player.getID();
-				int idLoser = TeamRed[i].player.getID() - 1;
-				for (size_t i = 0; i < players.size(); i++) {
-					if (players[i].getID() == idWinner) {
-						players[i].addRank();
-					}
-					if (players[i].getID() == idLoser) {
-						players[i].subRank();
-					}
+		for (size_t i = 0; i < TeamBlue.size(); i++) {
+
+			int idBlue = TeamBlue[i].player.getID();
+			int idRed = TeamRed[i].player.getID();
+
+			for (size_t j = 0; j < players.size(); j++)
+			{
+				switch (winner) {
+				case 1:
+					// Blue
+					if (players[j].getID() == idBlue) players[j].addRank();
+					if (players[j].getID() == idRed) players[j].subRank();
+					break;
+				case 2:
+					// Red
+					if (players[j].getID() == idRed) players[j].addRank();
+					if (players[j].getID() == idBlue) players[j].subRank();
+					break;
 				}
 			}
-			break;
-		case 2:
-			for (size_t i = 0; i < TeamRed.size(); i++) {
-				int idWinner = TeamRed[i].player.getID();
-				int idLoser = TeamBlue[i].player.getID() - 1;
-				for (size_t i = 0; i < players.size(); i++) {
-					if (players[i].getID() == idWinner) {
-						players[i].addRank();
-					}
-					if (players[i].getID() == idLoser) {
-						players[i].subRank();
-					}
-				}
-			}
-			break;
-		}
+		}	
 	}
 
 	void AddTeamPart() {
@@ -350,10 +354,8 @@ class Session {
 		if (fabs(mmrBlue - mmrRed) >= 100)	return false;
 		return true;
 	}
-
-
-	//Test
-	/*bool checkPlayers() {
+	
+	bool checkPlayers() {
 		int maxBlue = 0, maxRed = 0, minBlue = 999999999, minRed = 999999999;
 
 		for (size_t i = 0; i < TeamBlue.size(); i++)
@@ -365,16 +367,10 @@ class Session {
 			if (TeamRed[i].player.getRank() < minRed) minRed = TeamRed[i].player.getRank();
 		}
 
-		//Test
-		cout << "MaxBlue: " << maxBlue << endl;
-		cout << "minBlue: " << minBlue << endl;
-
-		cout << "maxRed: " << maxRed << endl;		
-		cout << "minRed: " << minRed << endl << endl;
-		if (maxBlue - minBlue <= 200 || maxRed - minRed <= 200) return false;
+		if (maxBlue - minBlue >= 200 || maxRed - minRed >= 200) return false;
 		
 		return true;
-	}*/
+	}
 
 	
 
@@ -392,14 +388,28 @@ public:
 		randVector(newHeroes);
 
 		//Add players and heroes to the Lobby
-		for (size_t i = 0; i < players.size(); i++) {
-			TeamPart tp = TeamPart(players[i], newHeroes[i]);
-			Lobby.push_back(tp);
+		for (size_t i = 0; i < 10; i++) {
+			if (newHeroes.size() < 10) {
+				if (i < 5) {
+					TeamPart tp = TeamPart(players[i], newHeroes[i]);
+					Lobby.push_back(tp);
+				}
+				else {
+					TeamPart tp = TeamPart(players[i], newHeroes[i - 5]);
+					Lobby.push_back(tp);
+				}
+			}
+			else {
+				TeamPart tp = TeamPart(players[i], newHeroes[i]);
+				Lobby.push_back(tp);
+			}
+			
 		}
 
 		AddTeamPart();
-		//Need test!
-		while (!checkTeams()) {
+		//Lim 10 000
+		for(int i = 0; (!checkTeams() || !checkPlayers()) && i < 10000; i++)
+		{
 			randVector(Lobby);
 			TeamBlue.clear();
 			TeamRed.clear();
@@ -416,7 +426,7 @@ public:
 		TeamBlue.clear();
 		Lobby.clear();
 	}
-	//Test
+
 	void showTeamRed() {
 		cout << endl
 			<< "                  Team Red" << endl << endl
@@ -581,16 +591,17 @@ int main() {
 	PlayerManager pm;
 	HeroManager hm;
 	SessionManager sm;
-	pm.generatePlayers(10);
+
+
+	pm.generatePlayers(20);
 	hm.createHeroes(10);
+
 	pm.ListOfPlayers();
 
-	sm.PerformGameSession(pm.players, hm.heroes, 5);
+	sm.PerformGameSession(pm.players, hm.heroes, 10);
 	sm.ListOfSessions();
 
 	pm.ListOfPlayers();
-
-	//Create menu
 
 	system("pause");
 	return 0;
