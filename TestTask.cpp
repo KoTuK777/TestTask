@@ -152,24 +152,19 @@ public:
 			}
 			else continue;
 		}
-		//???
-		cout << "There is no player with this name!" << endl;
 	}
 
 	Player GetPlayerById(int id) {
 		for (size_t i = 0; i < players.size(); i++) {
 			if (players[i].getID() == id) {
-				//Test
 				cout << "Name: " << players[i].getName()
 					<< "\tID: " << players[i].getID()
 					<< "\tRank: " << players[i].getRank()
 					<< endl << endl;
-				//End test
 				return players[i];
 			}
 		}
-		//???
-		/*cout << "There is no player with this id!" << endl;*/
+		cout << "There is no player with this name!" << endl;
 	}
 
 	void AddPlayer(string name) {
@@ -184,8 +179,6 @@ public:
 			break;
 		}
 	}
-
-	
 };
 
 class HeroManager {
@@ -223,18 +216,14 @@ public:
 	Hero GetHeroByName(string name) {
 		for (size_t i = 0; i < heroes.size(); i++) {
 			if (heroes[i].getName() == name) {
-				//Test
 				cout << "Name: " << heroes[i].getName()
 					<< "\tHP: " << heroes[i].getHP()
 					<< "\tDamage: " << heroes[i].getDamage()
 					<< "\tSpeed: " << heroes[i].getSpeed()
 					<< endl << endl;
-				//End test
 				return heroes[i];
 			}
-			else continue;
 		}
-		//???
 		cout << "There is no hero with this name!" << endl;
 	}
 
@@ -372,12 +361,9 @@ class Session {
 		return true;
 	}
 
-	
-
 public:
 	string arr[3] = { "Tie", "Blue", "Red" };
 	//Init
-
 	Session(vector<Player>& players, vector<Hero>& heroes) {
 		// Copy heroes to the new array
 		for (size_t i = 0; i < heroes.size(); i++) {
@@ -403,7 +389,6 @@ public:
 				TeamPart tp = TeamPart(players[i], newHeroes[i]);
 				Lobby.push_back(tp);
 			}
-			
 		}
 
 		AddTeamPart();
@@ -593,7 +578,7 @@ int main() {
 	SessionManager sm;
 
 
-	pm.generatePlayers(20);
+	pm.generatePlayers(10);
 	hm.createHeroes(10);
 
 	pm.ListOfPlayers();
