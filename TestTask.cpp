@@ -8,6 +8,7 @@
 #include "string.h"
 #include <vector>  
 #include <math.h>
+#include <fstream>
 
 using namespace std;
 
@@ -260,6 +261,7 @@ class Session {
 	vector<TeamPart> TeamBlue;
 	vector<Hero> newHeroes;
 	time_t StartTime = 0;
+	ofstream fout;
 
 	int winner = -1;
 
@@ -375,6 +377,8 @@ class Session {
 		return true;
 	}*/
 
+	
+
 public:
 	string arr[3] = { "Tie", "Blue", "Red" };
 	//Init
@@ -393,7 +397,7 @@ public:
 		}
 
 		AddTeamPart();
-
+		//Need test!
 		while (!checkTeams()) {
 			randVector(Lobby);
 			TeamBlue.clear();
@@ -471,14 +475,73 @@ public:
 
 	void showTime() {
 		tm* ltm = localtime(&StartTime);
-		cout << "Date: " << ltm->tm_mday << "/" << 1 + ltm->tm_mon << "/" << 1900 + ltm->tm_year << "\t";
-		cout << "Time: " << ltm->tm_hour << ":";
-		cout << ltm->tm_min << ":";
-		cout << ltm->tm_sec << endl;
+		cout << "Date: " << ltm->tm_mday << "/" << 1 + ltm->tm_mon << "/" << 1900 + ltm->tm_year << "\t"
+		     << "Time: " << ltm->tm_hour << ":" << ltm->tm_min << ":" << ltm->tm_sec << endl;
 	}
 
 	int getWinner() {
 		return winner;
+	}
+
+	void saveLog() {
+		fout.open("log.txt", ofstream::app);
+
+		fout << endl << endl << "New Game" << endl << endl;
+
+		//Save time
+		tm* ltm = localtime(&StartTime);
+		fout << "Date: " << ltm->tm_mday << "/" << 1 + ltm->tm_mon << "/" << 1900 + ltm->tm_year << "\t"
+			 << "Time: " << ltm->tm_hour << ":" << ltm->tm_min << ":" << ltm->tm_sec << endl;
+
+		//Save winner
+		int winner = getWinner();
+		fout << arr[winner] << " won" << endl;
+
+		//Save team red
+		fout << endl
+			<< "                  Team Red" << endl << endl
+			<< "================================================" << endl << endl;
+		for (size_t i = 0; i < TeamRed.size(); i++)
+		{
+			//Show player info
+			fout << "Name: " << TeamRed[i].player.getName()
+				<< "\tID: " << TeamRed[i].player.getID()
+				<< "\tRank: " << TeamRed[i].player.getRank()
+				<< endl;
+			//Shwow hero info
+			fout << "Name: " << TeamRed[i].hero.getName()
+				<< "\tHP: " << TeamRed[i].hero.getHP()
+				<< "\tDamage: " << TeamRed[i].hero.getDamage()
+				<< "\tSpeed: " << TeamRed[i].hero.getSpeed()
+				<< endl
+				<< (i == TeamRed.size() - 1 ? "" : "------------------------------------------------")
+				<< endl;
+		}
+		fout << "================================================" << endl << endl;
+
+		//Save team blue
+		fout << endl
+			<< "                  Team Blue" << endl << endl
+			<< "================================================" << endl << endl;
+		for (size_t i = 0; i < TeamBlue.size(); i++)
+		{
+			//Show player info
+			fout << "Name: " << TeamBlue[i].player.getName()
+				<< "\tID: " << TeamBlue[i].player.getID()
+				<< "\tRank: " << TeamBlue[i].player.getRank()
+				<< endl;
+			//Shwow hero info
+			fout << "Name: " << TeamBlue[i].hero.getName()
+				<< "\tHP: " << TeamBlue[i].hero.getHP()
+				<< "\tDamage: " << TeamBlue[i].hero.getDamage()
+				<< "\tSpeed: " << TeamBlue[i].hero.getSpeed()
+				<< endl
+				<< (i == TeamBlue.size() - 1 ? "" : "------------------------------------------------")
+				<< endl;
+		}
+		fout << "================================================" << endl << endl;
+
+		fout.close();
 	}
 };
 
@@ -502,6 +565,7 @@ public:
 		for (int i = 0; i < num; i++) {
 			Session session(players, heroes);
 			session.gameStart(players);
+			session.saveLog();
 			session.showTime();
 			session.showTeamBlue();
 			session.showTeamRed();
@@ -521,14 +585,12 @@ int main() {
 
 	Session session(pm.players, hm.heroes);
 
-	sm.PerformGameSession(pm.players, hm.heroes, 20);
+	sm.PerformGameSession(pm.players, hm.heroes, 5);
 	sm.ListOfSessions();
-
-
-	/*TeamPart tp(pm.players[0], hm.heroes[0]);*/
 
 	pm.ListOfPlayers();
 
+	//Create menu
 
 	system("pause");
 	return 0;
