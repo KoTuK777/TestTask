@@ -111,7 +111,7 @@ public:
 		randVector(names);
 		for (int i = 0; i < n; i++) {
 			Player player = Player(names[i], 1000, i + 1);
-			players.push_back(player);
+			players.emplace_back(player);
 		}
 	}
 
@@ -163,7 +163,7 @@ public:
 	void AddPlayer(string name) {
 		int id = players[players.size() - 1].getID() + 1;
 		Player player = Player(name, 1000, id);
-		players.push_back(player);
+		players.emplace_back(player);
 	}
 
 	void RemovePlayer(int id) {
@@ -189,7 +189,7 @@ public:
 			int damage = rand() % 10 + 1;
 			int speed = rand() % 5 + 1;
 			Hero hero = Hero(names[i], hp, damage, speed);
-			heroes.push_back(hero);
+			heroes.emplace_back(hero);
 		}
 	}
 
@@ -232,7 +232,7 @@ public:
 			}
 		}
 		Hero hero = Hero(name, hp, damage, speed);
-		heroes.push_back(hero);
+		heroes.emplace_back(hero);
 	}
 
 	void RemovePlayer(string name) {
@@ -261,7 +261,6 @@ class Session {
 	vector<TeamPart> TeamBlue;
 	vector<Hero> newHeroes;
 	time_t StartTime = 0;
-	ofstream fout;
 
 	int winner = -1;
 
@@ -304,7 +303,7 @@ class Session {
 			for (size_t i = 0; i < TeamBlue.size(); i++) {
 				int idWinner = TeamBlue[i].player.getID();
 				int idLoser = TeamRed[i].player.getID() - 1;
-				for (int i = 0; i < players.size(); i++) {
+				for (size_t i = 0; i < players.size(); i++) {
 					if (players[i].getID() == idWinner) {
 						players[i].addRank();
 					}
@@ -318,7 +317,7 @@ class Session {
 			for (size_t i = 0; i < TeamRed.size(); i++) {
 				int idWinner = TeamRed[i].player.getID();
 				int idLoser = TeamBlue[i].player.getID() - 1;
-				for (int i = 0; i < players.size(); i++) {
+				for (size_t i = 0; i < players.size(); i++) {
 					if (players[i].getID() == idWinner) {
 						players[i].addRank();
 					}
@@ -334,10 +333,10 @@ class Session {
 	void AddTeamPart() {
 		for (size_t i = 0; i < Lobby.size(); i++) {
 			if (i < 5) {
-				TeamBlue.push_back(Lobby[i]);
+				TeamBlue.emplace_back(Lobby[i]);
 			}
 			else {
-				TeamRed.push_back(Lobby[i]);
+				TeamRed.emplace_back(Lobby[i]);
 			}
 		}
 	}
@@ -382,18 +381,20 @@ class Session {
 public:
 	string arr[3] = { "Tie", "Blue", "Red" };
 	//Init
+
 	Session(vector<Player>& players, vector<Hero>& heroes) {
 		// Copy heroes to the new array
 		for (size_t i = 0; i < heroes.size(); i++) {
-			newHeroes.push_back(heroes[i]);
+			newHeroes.emplace_back(heroes[i]);
 		}
 
+		randVector(players);
 		randVector(newHeroes);
 
 		//Add players and heroes to the Lobby
 		for (size_t i = 0; i < players.size(); i++) {
 			TeamPart tp = TeamPart(players[i], newHeroes[i]);
-			Lobby.push_back(tp);
+			Lobby.emplace_back(tp);
 		}
 
 		AddTeamPart();
@@ -484,6 +485,7 @@ public:
 	}
 
 	void saveLog() {
+		ofstream fout;
 		fout.open("log.txt", ofstream::app);
 
 		fout << endl << endl << "New Game" << endl << endl;
@@ -569,7 +571,7 @@ public:
 			session.showTime();
 			session.showTeamBlue();
 			session.showTeamRed();
-			sessions.push_back(session);
+			sessions.emplace_back(session);
 		}
 	}
 };
@@ -582,8 +584,6 @@ int main() {
 	pm.generatePlayers(10);
 	hm.createHeroes(10);
 	pm.ListOfPlayers();
-
-	Session session(pm.players, hm.heroes);
 
 	sm.PerformGameSession(pm.players, hm.heroes, 5);
 	sm.ListOfSessions();
