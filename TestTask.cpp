@@ -6,8 +6,7 @@
 #include <conio.h>
 #include <string>
 #include "string.h"
-#include <vector>  
-#include <math.h>
+#include <vector>
 #include <fstream>
 
 using namespace std;
