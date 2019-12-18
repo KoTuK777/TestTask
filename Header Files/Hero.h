@@ -38,5 +38,4 @@ public:
 	int getSpeed() {
 		return speed;
 	}
-
 };
