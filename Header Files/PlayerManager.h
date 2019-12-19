@@ -50,29 +50,17 @@ public:
 	Player GetPlayerByName(string name) {
 		for (size_t i = 0; i < players.size(); i++) {
 			if (players[i].getName() == name) {
-				//Test
-				cout << "Name: " << players[i].getName()
-					<< "\tID: " << players[i].getID()
-					<< "\tRank: " << players[i].getRank()
-					<< endl << endl;
-				//End test
 				return players[i];
 			}
-			else continue;
 		}
 	}
 
 	Player GetPlayerById(int id) {
 		for (size_t i = 0; i < players.size(); i++) {
 			if (players[i].getID() == id) {
-				cout << "Name: " << players[i].getName()
-					<< "\tID: " << players[i].getID()
-					<< "\tRank: " << players[i].getRank()
-					<< endl << endl;
 				return players[i];
 			}
 		}
-		cout << "There is no player with this name!" << endl;
 	}
 
 	void AddPlayer(string name) {
@@ -88,4 +76,3 @@ public:
 		}
 	}
 };
-
