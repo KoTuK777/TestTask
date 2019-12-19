@@ -43,15 +43,9 @@ public:
 	Hero GetHeroByName(string name) {
 		for (size_t i = 0; i < heroes.size(); i++) {
 			if (heroes[i].getName() == name) {
-				cout << "Name: " << heroes[i].getName()
-					<< "\tHP: " << heroes[i].getHP()
-					<< "\tDamage: " << heroes[i].getDamage()
-					<< "\tSpeed: " << heroes[i].getSpeed()
-					<< endl << endl;
 				return heroes[i];
 			}
 		}
-		cout << "There is no hero with this name!" << endl;
 	}
 
 	int AddHero(string name, int hp, int damage, int speed) {
@@ -72,4 +66,3 @@ public:
 		}
 	}
 };
-
